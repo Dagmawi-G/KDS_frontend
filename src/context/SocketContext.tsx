@@ -20,8 +20,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // In dev, Vite proxies /socket.io to :3001 automatically
-    const socket = io({
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || undefined;
+    const socket = io(backendUrl, {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

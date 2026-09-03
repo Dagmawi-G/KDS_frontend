@@ -23,7 +23,12 @@ interface StaffPinModalProps {
 
 export const StaffPinModal: React.FC<StaffPinModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { loginWithPin } = useAuth();
+  const { loginWithPin, closePinModal } = useAuth();
+
+  const handleClose = () => {
+    if (onClose) onClose();
+    closePinModal();
+  };
 
   const [staffList, setStaffList] = useState<StaffUser[]>([]);
   const [selectedStaffId, setSelectedStaffId] = useState<number | undefined>(undefined);
@@ -118,8 +123,8 @@ export const StaffPinModal: React.FC<StaffPinModalProps> = ({ isOpen, onClose })
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
-        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity cursor-pointer"
+        onClick={handleClose}
       />
 
       <div
@@ -129,8 +134,10 @@ export const StaffPinModal: React.FC<StaffPinModalProps> = ({ isOpen, onClose })
       >
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800"
+          type="button"
+          onClick={handleClose}
+          aria-label="Close Staff Terminal"
+          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

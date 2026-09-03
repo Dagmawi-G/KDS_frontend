@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { SocketProvider } from './context/SocketContext';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
+import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './pages/LoginPage';
 import { CustomerMenu } from './pages/CustomerMenu';
 import { OrderTracker } from './pages/OrderTracker';
 import { KitchenKDS } from './pages/KitchenKDS';
@@ -19,38 +21,41 @@ export const App: React.FC = () => {
           <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
             <Navbar />
 
-          <main className="flex-1">
-            <Routes>
-              {/* Customer QR Ordering & Tracker */}
-              <Route path="/table/:tableNumber" element={<CustomerMenu />} />
-              <Route path="/table/:tableNumber/orders" element={<OrderTracker />} />
+            <main className="flex-1">
+              <Routes>
+                {/* Landing Portal & Login Pages */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/landing" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
 
-              {/* Kitchen Display System */}
-              <Route path="/kitchen" element={<KitchenKDS />} />
+                {/* Customer QR Ordering & Tracker */}
+                <Route path="/table/:tableNumber" element={<CustomerMenu />} />
+                <Route path="/table/:tableNumber/orders" element={<OrderTracker />} />
 
-              {/* Waiter Dispatch */}
-              <Route path="/waiter" element={<WaiterPaging />} />
+                {/* Kitchen Display System */}
+                <Route path="/kitchen" element={<KitchenKDS />} />
 
-              {/* Cashier & POS */}
-              <Route path="/cashier" element={<CashierPOS />} />
+                {/* Waiter Dispatch */}
+                <Route path="/waiter" element={<WaiterPaging />} />
 
-              {/* Admin & Reports */}
-              <Route path="/admin" element={<AdminManager />} />
+                {/* Cashier & POS */}
+                <Route path="/cashier" element={<CashierPOS />} />
 
-              {/* Printable Table QR Placards */}
-              <Route path="/qr-print" element={<QRPrintView />} />
+                {/* Admin & Reports */}
+                <Route path="/admin" element={<AdminManager />} />
 
-              {/* Default fallback route */}
-              <Route path="/" element={<Navigate to="/cashier" replace />} />
-              <Route path="*" element={<Navigate to="/cashier" replace />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </SocketProvider>
-  </AuthProvider>
+                {/* Printable Table QR Placards */}
+                <Route path="/qr-print" element={<QRPrintView />} />
+
+                {/* Fallback route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
   );
 };
 
 export default App;
-

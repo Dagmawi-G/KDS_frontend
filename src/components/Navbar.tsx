@@ -99,7 +99,11 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const { currentStaff, isPinModalOpen, openPinModal, logout } = useAuth();
+  const { currentStaff, isPinModalOpen, openPinModal, closePinModal, logout } = useAuth();
+
+  if (location.pathname === '/' || location.pathname === '/landing' || location.pathname === '/login') {
+    return null;
+  }
 
   return (
     <>
@@ -108,7 +112,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             {/* Brand */}
             <div className="flex items-center space-x-3">
-              <Link to="/cashier" className="flex items-center space-x-2.5 group">
+              <Link to="/" className="flex items-center space-x-2.5 group">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
                   <Utensils className="w-5 h-5 text-white" />
                 </div>
@@ -264,7 +268,7 @@ export const Navbar: React.FC = () => {
       </header>
 
       {/* Staff Keypad PIN Modal */}
-      <StaffPinModal isOpen={isPinModalOpen} onClose={() => {}} />
+      <StaffPinModal isOpen={isPinModalOpen} onClose={closePinModal} />
     </>
   );
 };
