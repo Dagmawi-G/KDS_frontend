@@ -223,15 +223,14 @@ export const OrderTracker: React.FC = () => {
                       </div>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider ${
-                          order.status === 'PENDING'
+                        className={`px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider ${order.status === 'PENDING'
                             ? 'bg-amber-100 text-amber-800 border border-amber-200 animate-pulse'
                             : order.status === 'PREPARING'
-                            ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                            : order.status === 'READY'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 animate-bounce-short'
-                            : 'bg-slate-100 text-slate-600'
-                        }`}
+                              ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                              : order.status === 'READY'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 animate-bounce-short'
+                                : 'bg-slate-100 text-slate-600'
+                          }`}
                       >
                         {order.status}
                       </span>
@@ -255,24 +254,22 @@ export const OrderTracker: React.FC = () => {
                           return (
                             <div key={s.label} className="relative z-10 flex flex-col items-center">
                               <div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                                  isCurrent
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isCurrent
                                     ? 'bg-orange-600 text-white ring-4 ring-orange-100 shadow-md scale-110'
                                     : isComplete
-                                    ? 'bg-orange-600 text-white'
-                                    : 'bg-slate-100 text-slate-400 border border-slate-300'
-                                }`}
+                                      ? 'bg-orange-600 text-white'
+                                      : 'bg-slate-100 text-slate-400 border border-slate-300'
+                                  }`}
                               >
                                 <Icon className="w-4 h-4" />
                               </div>
                               <span
-                                className={`text-[11px] font-bold mt-1.5 ${
-                                  isCurrent
+                                className={`text-[11px] font-bold mt-1.5 ${isCurrent
                                     ? 'text-orange-600 font-extrabold'
                                     : isComplete
-                                    ? 'text-slate-800'
-                                    : 'text-slate-400'
-                                }`}
+                                      ? 'text-slate-800'
+                                      : 'text-slate-400'
+                                  }`}
                               >
                                 {s.label}
                               </span>

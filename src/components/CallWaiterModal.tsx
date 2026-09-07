@@ -39,49 +39,49 @@ export const CallWaiterModal: React.FC<CallWaiterModalProps> = ({
     icon: any;
     color: string;
   }[] = [
-    {
-      type: 'WATER',
-      label: 'Ice Water',
-      description: 'Request fresh drinking water',
-      icon: Droplets,
-      color: 'bg-blue-50 text-blue-600 border-blue-200 hover:border-blue-400',
-    },
-    {
-      type: 'NAPKINS',
-      label: 'Extra Napkins',
-      description: 'Paper or cloth napkins',
-      icon: Scroll,
-      color: 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-400',
-    },
-    {
-      type: 'CUTLERY',
-      label: 'Plates & Cutlery',
-      description: 'Forks, spoons, or share plates',
-      icon: Utensils,
-      color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400',
-    },
-    {
-      type: 'WAITER',
-      label: 'Call Server',
-      description: 'Assistance from table waiter',
-      icon: UserCheck,
-      color: 'bg-purple-50 text-purple-600 border-purple-200 hover:border-purple-400',
-    },
-    {
-      type: 'BILL',
-      label: 'Request Bill',
-      description: 'Prepare check & payment',
-      icon: Receipt,
-      color: 'bg-rose-50 text-rose-600 border-rose-200 hover:border-rose-400',
-    },
-    {
-      type: 'OTHER',
-      label: 'Special Request',
-      description: 'Other inquiries or help',
-      icon: HelpCircle,
-      color: 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-400',
-    },
-  ];
+      {
+        type: 'WATER',
+        label: 'Ice Water',
+        description: 'Request fresh drinking water',
+        icon: Droplets,
+        color: 'bg-blue-50 text-blue-600 border-blue-200 hover:border-blue-400',
+      },
+      {
+        type: 'NAPKINS',
+        label: 'Extra Napkins',
+        description: 'Paper or cloth napkins',
+        icon: Scroll,
+        color: 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-400',
+      },
+      {
+        type: 'CUTLERY',
+        label: 'Plates & Cutlery',
+        description: 'Forks, spoons, or share plates',
+        icon: Utensils,
+        color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400',
+      },
+      {
+        type: 'WAITER',
+        label: 'Call Server',
+        description: 'Assistance from table waiter',
+        icon: UserCheck,
+        color: 'bg-purple-50 text-purple-600 border-purple-200 hover:border-purple-400',
+      },
+      {
+        type: 'BILL',
+        label: 'Request Bill',
+        description: 'Prepare check & payment',
+        icon: Receipt,
+        color: 'bg-rose-50 text-rose-600 border-rose-200 hover:border-rose-400',
+      },
+      {
+        type: 'OTHER',
+        label: 'Special Request',
+        description: 'Other inquiries or help',
+        icon: HelpCircle,
+        color: 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-400',
+      },
+    ];
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -166,11 +166,10 @@ export const CallWaiterModal: React.FC<CallWaiterModalProps> = ({
                     key={opt.type}
                     type="button"
                     onClick={() => setSelectedType(opt.type)}
-                    className={`flex items-start p-3 rounded-xl border-2 text-left transition-all ${
-                      isSelected
+                    className={`flex items-start p-3 rounded-xl border-2 text-left transition-all ${isSelected
                         ? 'border-orange-500 bg-orange-50/50 shadow-sm ring-2 ring-orange-500/20'
                         : opt.color
-                    }`}
+                      }`}
                   >
                     <Icon className={`w-5 h-5 mr-2.5 shrink-0 mt-0.5 ${isSelected ? 'text-orange-600' : ''}`} />
                     <div>

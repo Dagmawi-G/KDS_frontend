@@ -28,10 +28,10 @@ const AuthContext = createContext<AuthContextType>({
   currentStaff: null,
   isAuthenticated: false,
   loginWithPin: async () => ({ success: false, error: 'Auth not initialized' }),
-  logout: () => {},
+  logout: () => { },
   isPinModalOpen: false,
-  openPinModal: () => {},
-  closePinModal: () => {},
+  openPinModal: () => { },
+  closePinModal: () => { },
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

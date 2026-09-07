@@ -213,9 +213,8 @@ export const LoginPage: React.FC = () => {
       </div>
 
       <div
-        className={`relative bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl z-10 transition-all ${
-          isShaking ? 'animate-bounce' : 'animate-in fade-in zoom-in-95'
-        }`}
+        className={`relative bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl z-10 transition-all ${isShaking ? 'animate-bounce' : 'animate-in fade-in zoom-in-95'
+          }`}
       >
         {/* Header */}
         <div className="text-center mb-5">
@@ -340,11 +339,10 @@ export const LoginPage: React.FC = () => {
                         setPin('');
                         setErrorMsg('');
                       }}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs text-left transition-all ${
-                        isCurrent
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-xs text-left transition-all ${isCurrent
                           ? 'border-orange-500/80 bg-orange-500/15 text-white ring-1 ring-orange-500/30'
                           : 'border-slate-800/80 bg-slate-900/60 text-slate-300 hover:bg-slate-800 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-2.5">
                         <div className="p-1.5 rounded-lg bg-slate-800">
@@ -398,11 +396,10 @@ export const LoginPage: React.FC = () => {
               return (
                 <div
                   key={index}
-                  className={`w-11 h-12 rounded-xl flex items-center justify-center font-mono text-lg font-black transition-all duration-200 ${
-                    isFilled
+                  className={`w-11 h-12 rounded-xl flex items-center justify-center font-mono text-lg font-black transition-all duration-200 ${isFilled
                       ? 'bg-orange-500/20 border-2 border-orange-500 text-orange-400 shadow-md shadow-orange-500/20 scale-105'
                       : 'bg-slate-800/80 border border-slate-700 text-slate-500'
-                  }`}
+                    }`}
                 >
                   {isFilled ? (showPin ? digit : '●') : ''}
                 </div>
@@ -468,11 +465,10 @@ export const LoginPage: React.FC = () => {
           type="button"
           onClick={() => submitLogin(pin)}
           disabled={isSubmitting || pin.length < 4}
-          className={`w-full mt-3 py-3 rounded-2xl font-bold text-sm flex items-center justify-center space-x-2 transition-all shadow-lg ${
-            pin.length === 4
+          className={`w-full mt-3 py-3 rounded-2xl font-bold text-sm flex items-center justify-center space-x-2 transition-all shadow-lg ${pin.length === 4
               ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-orange-600/30 hover:scale-[1.01] cursor-pointer'
               : 'bg-slate-800 text-slate-500 border border-slate-700/60 cursor-not-allowed'
-          }`}
+            }`}
         >
           {isSubmitting ? (
             <span>Authenticating...</span>

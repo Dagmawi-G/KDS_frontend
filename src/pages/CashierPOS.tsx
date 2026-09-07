@@ -320,11 +320,10 @@ export const CashierPOS: React.FC = () => {
           <button
             key={f.id}
             onClick={() => setFilterStatus(f.id)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-              filterStatus === f.id
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${filterStatus === f.id
                 ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-            }`}
+              }`}
           >
             {f.label}
           </button>
@@ -343,9 +342,8 @@ export const CashierPOS: React.FC = () => {
               <div
                 key={table.id}
                 onClick={() => handleSelectTable(table)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between min-h-[160px] ${
-                  visual.bg
-                } ${isSelected ? 'ring-3 ring-orange-500 scale-[1.02]' : ''}`}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between min-h-[160px] ${visual.bg
+                  } ${isSelected ? 'ring-3 ring-orange-500 scale-[1.02]' : ''}`}
               >
                 <div>
                   {/* Card Header */}
@@ -402,9 +400,8 @@ export const CashierPOS: React.FC = () => {
                       Table #{selectedTable.tableNumber}
                     </span>
                     <span
-                      className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase ${
-                        getTableVisuals(selectedTable.status).badgeStyle
-                      }`}
+                      className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase ${getTableVisuals(selectedTable.status).badgeStyle
+                        }`}
                     >
                       {selectedTable.status}
                     </span>
@@ -443,11 +440,10 @@ export const CashierPOS: React.FC = () => {
                     <button
                       key={st}
                       onClick={() => handleChangeStatus(selectedTable.tableNumber, st)}
-                      className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all text-left border ${
-                        selectedTable.status === st
+                      className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all text-left border ${selectedTable.status === st
                           ? 'border-orange-500 bg-orange-50 text-orange-900 font-extrabold'
                           : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       {st}
                     </button>

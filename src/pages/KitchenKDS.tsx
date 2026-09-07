@@ -174,11 +174,10 @@ export const KitchenKDS: React.FC = () => {
 
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border ${
-              soundEnabled
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border ${soundEnabled
                 ? 'bg-orange-500/20 text-orange-400 border-orange-500/40'
                 : 'bg-slate-900 text-slate-500 border-slate-800'
-            }`}
+              }`}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             <span>{soundEnabled ? 'Alerts On' : 'Muted'}</span>

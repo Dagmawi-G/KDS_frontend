@@ -247,11 +247,10 @@ export const CustomerMenu: React.FC = () => {
         <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none">
           <button
             onClick={() => setSelectedCategory('ALL')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              selectedCategory === 'ALL'
+            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${selectedCategory === 'ALL'
                 ? 'bg-slate-900 text-white shadow-md shadow-slate-900/20'
                 : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-100'
-            }`}
+              }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-orange-500" />
             <span>Full Menu</span>
@@ -262,11 +261,10 @@ export const CustomerMenu: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  isSelected
+                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${isSelected
                     ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
                     : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-100'
-                }`}
+                  }`}
               >
                 {cat.name}
               </button>

@@ -358,11 +358,10 @@ export const AdminManager: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  active
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${active
                     ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
                     : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -482,9 +481,9 @@ export const AdminManager: React.FC = () => {
                           {s.paymentMethod || 'CARD'} ·{' '}
                           {s.closedAt
                             ? new Date(s.closedAt).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
                             : ''}
                         </p>
                       </div>
@@ -554,11 +553,10 @@ export const AdminManager: React.FC = () => {
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                   <button
                     onClick={() => handleToggleAvailability(item)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-colors ${
-                      item.isAvailable
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase transition-colors ${item.isAvailable
                         ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-slate-100 text-slate-500'
-                    }`}
+                      }`}
                   >
                     {item.isAvailable ? 'In Stock' : 'Out of Stock'}
                   </button>
@@ -767,11 +765,10 @@ export const AdminManager: React.FC = () => {
                       <button
                         onClick={() => handleToggleStaffStatus(staff)}
                         title={`Click to ${staff.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}`}
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase cursor-pointer transition-colors ${
-                          staff.status === 'ACTIVE'
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase cursor-pointer transition-colors ${staff.status === 'ACTIVE'
                             ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200'
                             : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
-                        }`}
+                          }`}
                       >
                         {staff.status}
                       </button>
@@ -780,15 +777,14 @@ export const AdminManager: React.FC = () => {
                     {/* Role Badge */}
                     <div className="mb-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${
-                          staff.role === 'ADMIN' || staff.role === 'MANAGER'
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${staff.role === 'ADMIN' || staff.role === 'MANAGER'
                             ? 'bg-orange-100 text-orange-800 border border-orange-200'
                             : staff.role === 'WAITER'
-                            ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                            : staff.role === 'CASHIER'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                            : 'bg-rose-100 text-rose-800 border border-rose-200'
-                        }`}
+                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                              : staff.role === 'CASHIER'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : 'bg-rose-100 text-rose-800 border border-rose-200'
+                          }`}
                       >
                         {staff.role === 'ADMIN' || staff.role === 'MANAGER' ? (
                           <Shield className="w-3.5 h-3.5" />
