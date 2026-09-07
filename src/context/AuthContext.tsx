@@ -65,7 +65,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
 
       if (res.ok && data.user) {
         setCurrentStaff(data.user);
@@ -76,11 +82,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return {
         success: false,
-        error: data.error || 'Authentication failed. Please check your credentials.',
+        error: data.error || (res.status === 401 ? 'Incorrect PIN code. Please try again.' : 'Authentication failed. Please check your credentials.'),
       };
     } catch (e: any) {
       console.error('Login error:', e);
-      return { success: false, error: e.message || 'Connection error. Please try again.' };
+      return { success: false, error: 'Unable to connect to server. Please try again.' };
     }
   };
 

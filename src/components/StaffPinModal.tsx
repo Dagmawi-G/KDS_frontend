@@ -48,26 +48,38 @@ export const StaffPinModal: React.FC<StaffPinModalProps> = ({ isOpen, onClose })
   const [isShaking, setIsShaking] = useState(false);
   const [showDemoPins, setShowDemoPins] = useState(false);
 
+  const [isLoadingStaff, setIsLoadingStaff] = useState(false);
+
+  const loadStaff = useCallback(async () => {
+    setIsLoadingStaff(true);
+    try {
+      const res = await fetch('/api/auth/staff');
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : [];
+      if (Array.isArray(data)) {
+        const activeStaff = data.filter((s: StaffUser) => s.status === 'ACTIVE');
+        setStaffList(activeStaff);
+        if (activeStaff.length > 0) {
+          setSelectedStaff((prev) => prev || activeStaff[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load staff list:', err);
+    } finally {
+      setIsLoadingStaff(false);
+    }
+  }, []);
+
   // Fetch staff list on open
   useEffect(() => {
     if (isOpen) {
       setPin('');
       setErrorMsg('');
       setIsDropdownOpen(false);
-      fetch('/api/auth/staff')
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data)) {
-            const activeStaff = data.filter((s: StaffUser) => s.status === 'ACTIVE');
-            setStaffList(activeStaff);
-            if (activeStaff.length > 0 && !selectedStaff) {
-              setSelectedStaff(activeStaff[0]);
-            }
-          }
-        })
-        .catch((err) => console.error('Failed to load staff list:', err));
+      loadStaff();
     }
-  }, [isOpen]);
+  }, [isOpen, loadStaff]);
 
   const getRoleIcon = (role: string, className = 'w-4 h-4') => {
     switch (role) {
@@ -290,8 +302,18 @@ export const StaffPinModal: React.FC<StaffPinModalProps> = ({ isOpen, onClose })
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-2xl bg-slate-800 border border-slate-700 text-xs text-slate-400 text-center">
-              Loading staff accounts...
+            <div className="p-3 rounded-2xl bg-slate-800 border border-slate-700 text-xs text-slate-400 flex items-center justify-between">
+              <span className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+                <span>{isLoadingStaff ? 'Connecting to staff database...' : 'No active staff accounts loaded'}</span>
+              </span>
+              <button
+                type="button"
+                onClick={loadStaff}
+                className="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-bold text-[11px] transition-colors cursor-pointer"
+              >
+                Retry
+              </button>
             </div>
           )}
 
