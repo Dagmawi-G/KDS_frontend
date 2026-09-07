@@ -1,10 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { StaffUser } from '../types';
 
+export interface LoginParams {
+  pinCode: string;
+  staffId?: number;
+  email?: string;
+  name?: string;
+  identifier?: string;
+}
+
+export interface LoginResult {
+  success: boolean;
+  error?: string;
+}
+
 interface AuthContextType {
   currentStaff: StaffUser | null;
   isAuthenticated: boolean;
-  loginWithPin: (pinCode: string, staffId?: number) => Promise<boolean>;
+  loginWithPin: (params: string | LoginParams, staffId?: number) => Promise<LoginResult>;
   logout: () => void;
   isPinModalOpen: boolean;
   openPinModal: () => void;
@@ -14,7 +27,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   currentStaff: null,
   isAuthenticated: false,
-  loginWithPin: async () => false,
+  loginWithPin: async () => ({ success: false, error: 'Auth not initialized' }),
   logout: () => {},
   isPinModalOpen: false,
   openPinModal: () => {},
@@ -33,25 +46,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
-  const loginWithPin = async (pinCode: string, staffId?: number): Promise<boolean> => {
+  const loginWithPin = async (
+    params: string | LoginParams,
+    optionalStaffId?: number
+  ): Promise<LoginResult> => {
     try {
+      let body: Record<string, any> = {};
+
+      if (typeof params === 'string') {
+        body = { pinCode: params, staffId: optionalStaffId };
+      } else {
+        body = { ...params };
+      }
+
       const res = await fetch('/api/auth/pin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pinCode, staffId }),
+        body: JSON.stringify(body),
       });
 
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json();
+
+      if (res.ok && data.user) {
         setCurrentStaff(data.user);
         localStorage.setItem('dine_os_staff', JSON.stringify(data.user));
         setIsPinModalOpen(false);
-        return true;
+        return { success: true };
       }
-      return false;
-    } catch (e) {
+
+      return {
+        success: false,
+        error: data.error || 'Authentication failed. Please check your credentials.',
+      };
+    } catch (e: any) {
       console.error('Login error:', e);
-      return false;
+      return { success: false, error: e.message || 'Connection error. Please try again.' };
     }
   };
 
@@ -59,7 +88,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentStaff(null);
     localStorage.removeItem('dine_os_staff');
   };
-
 
   return (
     <AuthContext.Provider
@@ -79,3 +107,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => useContext(AuthContext);
+
