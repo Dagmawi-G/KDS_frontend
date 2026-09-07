@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { StaffUser } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl } from '../utils/api';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export const LoginPage: React.FC = () => {
   const loadStaff = useCallback(async () => {
     setIsLoadingStaff(true);
     try {
-      const res = await fetch('/api/auth/staff');
+      const res = await fetch(apiUrl('/api/auth/staff'));
       if (!res.ok) throw new Error('Server returned ' + res.status);
       const text = await res.text();
       const data = text ? JSON.parse(text) : [];

@@ -16,6 +16,7 @@ import {
 import { Order, OrderStatus } from '../types';
 import { useSocket } from '../context/SocketContext';
 import { sounds } from '../utils/audio';
+import { apiUrl } from '../utils/api';
 
 export const KitchenKDS: React.FC = () => {
   const { socket, joinRoom } = useSocket();
@@ -29,7 +30,7 @@ export const KitchenKDS: React.FC = () => {
     try {
       setIsLoading(true);
       const res = await fetch(
-        '/api/orders?status=PENDING,ACCEPTED,PREPARING,READY'
+        apiUrl('/api/orders?status=PENDING,ACCEPTED,PREPARING,READY')
       );
       if (res.ok) {
         const data = await res.json();
@@ -93,7 +94,7 @@ export const KitchenKDS: React.FC = () => {
   // Update order status action
   const handleUpdateStatus = async (orderId: number, nextStatus: OrderStatus) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      const res = await fetch(apiUrl(`/api/orders/${orderId}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus }),

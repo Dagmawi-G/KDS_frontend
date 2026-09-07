@@ -29,6 +29,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { Category, MenuItem, DashboardReport, Table, StaffUser } from '../types';
+import { apiUrl } from '../utils/api';
 
 export const AdminManager: React.FC = () => {
   const navigate = useNavigate();
@@ -83,22 +84,22 @@ export const AdminManager: React.FC = () => {
     try {
       setIsLoading(true);
       // 1. Fetch Analytics Report
-      const reportRes = await fetch('/api/reports/dashboard');
+      const reportRes = await fetch(apiUrl('/api/reports/dashboard'));
       if (reportRes.ok) setReport(await reportRes.json());
 
       // 2. Fetch Menu & Categories
-      const menuRes = await fetch('/api/menu');
+      const menuRes = await fetch(apiUrl('/api/menu'));
       if (menuRes.ok) setCategories(await menuRes.json());
 
-      const itemsRes = await fetch('/api/menu/items');
+      const itemsRes = await fetch(apiUrl('/api/menu/items'));
       if (itemsRes.ok) setMenuItems(await itemsRes.json());
 
       // 3. Fetch Tables
-      const tablesRes = await fetch('/api/tables');
+      const tablesRes = await fetch(apiUrl('/api/tables'));
       if (tablesRes.ok) setTables(await tablesRes.json());
 
       // 4. Fetch Staff Members
-      const staffRes = await fetch('/api/auth/staff');
+      const staffRes = await fetch(apiUrl('/api/auth/staff'));
       if (staffRes.ok) setStaffList(await staffRes.json());
     } catch (e) {
       console.error('Error fetching admin data:', e);
@@ -141,7 +142,7 @@ export const AdminManager: React.FC = () => {
     try {
       if (editingStaff) {
         // Update Staff
-        const res = await fetch(`/api/auth/staff/${editingStaff.id}`, {
+        const res = await fetch(apiUrl(`/api/auth/staff/${editingStaff.id}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(staffFormData),
@@ -156,7 +157,7 @@ export const AdminManager: React.FC = () => {
         }
       } else {
         // Register Staff
-        const res = await fetch('/api/auth/staff', {
+        const res = await fetch(apiUrl('/api/auth/staff'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(staffFormData),
@@ -178,7 +179,7 @@ export const AdminManager: React.FC = () => {
   const handleToggleStaffStatus = async (staff: StaffUser) => {
     const newStatus = staff.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
-      const res = await fetch(`/api/auth/staff/${staff.id}/status`, {
+      const res = await fetch(apiUrl(`/api/auth/staff/${staff.id}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -196,7 +197,7 @@ export const AdminManager: React.FC = () => {
   const handleDeleteStaff = async (id: number) => {
     if (!window.confirm('Are you sure you want to remove this staff profile?')) return;
     try {
-      const res = await fetch(`/api/auth/staff/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/auth/staff/${id}`), { method: 'DELETE' });
       if (res.ok) {
         setStaffList((prev) => prev.filter((s) => s.id !== id));
       }
@@ -210,7 +211,7 @@ export const AdminManager: React.FC = () => {
   const handleToggleAvailability = async (item: MenuItem) => {
     try {
       const newStatus = !item.isAvailable;
-      const res = await fetch(`/api/menu/items/${item.id}/availability`, {
+      const res = await fetch(apiUrl(`/api/menu/items/${item.id}/availability`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isAvailable: newStatus }),
@@ -261,7 +262,7 @@ export const AdminManager: React.FC = () => {
     e.preventDefault();
     try {
       if (editingItem) {
-        const res = await fetch(`/api/menu/items/${editingItem.id}`, {
+        const res = await fetch(apiUrl(`/api/menu/items/${editingItem.id}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -272,7 +273,7 @@ export const AdminManager: React.FC = () => {
           setIsItemModalOpen(false);
         }
       } else {
-        const res = await fetch('/api/menu/items', {
+        const res = await fetch(apiUrl('/api/menu/items'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -292,7 +293,7 @@ export const AdminManager: React.FC = () => {
   const handleDeleteItem = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this menu item?')) return;
     try {
-      const res = await fetch(`/api/menu/items/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/menu/items/${id}`), { method: 'DELETE' });
       if (res.ok) {
         setMenuItems((prev) => prev.filter((i) => i.id !== id));
       }
@@ -306,7 +307,7 @@ export const AdminManager: React.FC = () => {
     e.preventDefault();
     if (!newTableNumber) return;
     try {
-      const res = await fetch('/api/tables', {
+      const res = await fetch(apiUrl('/api/tables'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

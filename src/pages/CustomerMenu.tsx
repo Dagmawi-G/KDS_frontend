@@ -17,6 +17,7 @@ import { Category, MenuItem, CartItem, TableSession, Order } from '../types';
 import { useSocket } from '../context/SocketContext';
 import { CartDrawer } from '../components/CartDrawer';
 import { CallWaiterModal } from '../components/CallWaiterModal';
+import { apiUrl } from '../utils/api';
 
 export const CustomerMenu: React.FC = () => {
   const { tableNumber = '01' } = useParams<{ tableNumber: string }>();
@@ -42,14 +43,14 @@ export const CustomerMenu: React.FC = () => {
       try {
         setIsLoading(true);
         // 1. Fetch menu
-        const menuRes = await fetch('/api/menu');
+        const menuRes = await fetch(apiUrl('/api/menu'));
         if (menuRes.ok) {
           const menuData = await menuRes.json();
           setCategories(menuData);
         }
 
         // 2. Fetch or initialize active session for table
-        const sessionRes = await fetch(`/api/tables/${tableNumber}/session`, {
+        const sessionRes = await fetch(apiUrl(`/api/tables/${tableNumber}/session`), {
           method: 'POST',
         });
         if (sessionRes.ok) {

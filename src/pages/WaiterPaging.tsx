@@ -17,6 +17,7 @@ import {
 import { Order, AssistanceRequest, Table } from '../types';
 import { useSocket } from '../context/SocketContext';
 import { sounds } from '../utils/audio';
+import { apiUrl } from '../utils/api';
 
 export const WaiterPaging: React.FC = () => {
   const { socket, joinRoom } = useSocket();
@@ -30,19 +31,19 @@ export const WaiterPaging: React.FC = () => {
     try {
       setIsLoading(true);
       // 1. Fetch ready orders
-      const ordersRes = await fetch('/api/orders?status=READY');
+      const ordersRes = await fetch(apiUrl('/api/orders?status=READY'));
       if (ordersRes.ok) {
         setReadyOrders(await ordersRes.json());
       }
 
       // 2. Fetch open assistance requests
-      const assistRes = await fetch('/api/assistance?status=OPEN');
+      const assistRes = await fetch(apiUrl('/api/assistance?status=OPEN'));
       if (assistRes.ok) {
         setAssistanceRequests(await assistRes.json());
       }
 
       // 3. Fetch tables
-      const tablesRes = await fetch('/api/tables');
+      const tablesRes = await fetch(apiUrl('/api/tables'));
       if (tablesRes.ok) {
         setTables(await tablesRes.json());
       }
@@ -112,7 +113,7 @@ export const WaiterPaging: React.FC = () => {
   // Mark Order Delivered / Served
   const handleMarkServed = async (orderId: number) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      const res = await fetch(apiUrl(`/api/orders/${orderId}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'SERVED' }),
@@ -128,7 +129,7 @@ export const WaiterPaging: React.FC = () => {
   // Resolve Assistance Request
   const handleResolveAssistance = async (id: number) => {
     try {
-      const res = await fetch(`/api/assistance/${id}/resolve`, {
+      const res = await fetch(apiUrl(`/api/assistance/${id}/resolve`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'RESOLVED' }),

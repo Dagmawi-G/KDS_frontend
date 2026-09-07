@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { StaffUser } from '../types';
+import { apiUrl } from '../utils/api';
 
 export interface LoginParams {
   pinCode: string;
@@ -59,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body = { ...params };
       }
 
-      const res = await fetch('/api/auth/pin-login', {
+      const res = await fetch(apiUrl('/api/auth/pin-login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

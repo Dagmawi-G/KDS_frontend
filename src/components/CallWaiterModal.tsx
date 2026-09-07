@@ -11,6 +11,7 @@ import {
   Send,
 } from 'lucide-react';
 import { AssistanceType } from '../types';
+import { apiUrl } from '../utils/api';
 
 interface CallWaiterModalProps {
   isOpen: boolean;
@@ -86,7 +87,7 @@ export const CallWaiterModal: React.FC<CallWaiterModalProps> = ({
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/assistance', {
+      const res = await fetch(apiUrl('/api/assistance'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

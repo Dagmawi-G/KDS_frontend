@@ -16,6 +16,7 @@ import { Order, OrderStatus, TableSession } from '../types';
 import { useSocket } from '../context/SocketContext';
 import { CallWaiterModal } from '../components/CallWaiterModal';
 import { ReceiptModal } from '../components/ReceiptModal';
+import { apiUrl } from '../utils/api';
 
 export const OrderTracker: React.FC = () => {
   const { tableNumber = '01' } = useParams<{ tableNumber: string }>();
@@ -33,7 +34,7 @@ export const OrderTracker: React.FC = () => {
   const fetchSession = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/tables/${tableNumber}`);
+      const res = await fetch(apiUrl(`/api/tables/${tableNumber}`));
       if (res.ok) {
         const data = await res.json();
         setSession(data.activeSession);
@@ -89,7 +90,7 @@ export const OrderTracker: React.FC = () => {
   const handleRequestBill = async () => {
     setIsRequestingBill(true);
     try {
-      const res = await fetch('/api/cashier/request-bill', {
+      const res = await fetch(apiUrl('/api/cashier/request-bill'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tableNumber }),

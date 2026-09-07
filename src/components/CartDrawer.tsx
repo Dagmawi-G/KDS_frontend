@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingBag, X, Plus, Minus, Trash2, Send, ChefHat, MessageSquareQuote } from 'lucide-react';
 import { CartItem } from '../types';
+import { apiUrl } from '../utils/api';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         })),
       };
 
-      const res = await fetch('/api/orders', {
+      const res = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

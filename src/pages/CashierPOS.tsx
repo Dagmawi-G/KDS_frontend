@@ -18,6 +18,7 @@ import {
 import { Table, TableStatus, TableSession } from '../types';
 import { useSocket } from '../context/SocketContext';
 import { ReceiptModal } from '../components/ReceiptModal';
+import { apiUrl } from '../utils/api';
 
 export const CashierPOS: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export const CashierPOS: React.FC = () => {
   const fetchTables = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/tables');
+      const res = await fetch(apiUrl('/api/tables'));
       if (res.ok) {
         const data = await res.json();
         setTables(data);
@@ -105,7 +106,7 @@ export const CashierPOS: React.FC = () => {
   // Payment Settlement handler
   const handleSettlePayment = async (sessionId: string, method: string) => {
     try {
-      const res = await fetch('/api/cashier/settle', {
+      const res = await fetch(apiUrl('/api/cashier/settle'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, paymentMethod: method }),
@@ -123,7 +124,7 @@ export const CashierPOS: React.FC = () => {
   // Manual Table Status Change
   const handleChangeStatus = async (tableNumber: string, newStatus: TableStatus) => {
     try {
-      await fetch(`/api/tables/${tableNumber}/status`, {
+      await fetch(apiUrl(`/api/tables/${tableNumber}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -138,7 +139,7 @@ export const CashierPOS: React.FC = () => {
   const handleResetTable = async (tableNumber: string) => {
     if (!window.confirm(`Are you sure you want to reset Table #${tableNumber} to Available?`)) return;
     try {
-      await fetch(`/api/cashier/reset-table/${tableNumber}`, {
+      await fetch(apiUrl(`/api/cashier/reset-table/${tableNumber}`), {
         method: 'POST',
       });
       fetchTables();
