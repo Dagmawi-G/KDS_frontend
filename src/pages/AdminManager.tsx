@@ -27,13 +27,35 @@ import {
   BellRing,
   CreditCard,
   UserCheck,
+  Sliders,
+  Smartphone,
+  Sparkles,
+  RotateCcw,
+  CheckCircle2,
+  Building2,
+  Receipt,
+  HelpCircle,
+  Save,
 } from 'lucide-react';
-import { Category, MenuItem, DashboardReport, Table, StaffUser } from '../types';
+import { Category, MenuItem, DashboardReport, Table, StaffUser, OperatingPreset } from '../types';
 import { apiUrl } from '../utils/api';
+import { useSettings, PRESET_CONFIGS } from '../context/SettingsContext';
 
 export const AdminManager: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'ANALYTICS' | 'MENU' | 'TABLES' | 'STAFF'>('ANALYTICS');
+  const {
+    settings,
+    updateModules,
+    updateWorkflow,
+    updateBranding,
+    applyPreset,
+    resetToDefaults,
+  } = useSettings();
+
+  const [activeTab, setActiveTab] = useState<
+    'ANALYTICS' | 'MENU' | 'TABLES' | 'STAFF' | 'SETTINGS'
+  >('ANALYTICS');
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
   const [report, setReport] = useState<DashboardReport | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -41,6 +63,42 @@ export const AdminManager: React.FC = () => {
   const [staffList, setStaffList] = useState<StaffUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showPins, setShowPins] = useState<{ [id: number]: boolean }>({});
+
+  // Brand & Localization Form State
+  const [brandingForm, setBrandingForm] = useState(settings.branding);
+  const [isSavingBranding, setIsSavingBranding] = useState(false);
+  const [brandingSaved, setBrandingSaved] = useState(false);
+
+  useEffect(() => {
+    setBrandingForm(settings.branding);
+  }, [settings.branding]);
+
+  const handleSaveBranding = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setIsSavingBranding(true);
+    try {
+      const taxNum = typeof brandingForm.taxRate === 'number' ? brandingForm.taxRate : parseFloat(String(brandingForm.taxRate)) || 0;
+      const serviceNum = typeof brandingForm.serviceCharge === 'number' ? brandingForm.serviceCharge : parseFloat(String(brandingForm.serviceCharge)) || 0;
+
+      await updateBranding({
+        name: brandingForm.name.trim() || 'Dine OS',
+        tagline: brandingForm.tagline.trim() || '',
+        currencySymbol: brandingForm.currencySymbol.trim() || 'ETB',
+        taxRate: taxNum,
+        serviceCharge: serviceNum,
+      });
+      setBrandingSaved(true);
+      setSaveSuccessMsg('Branding, currency, and tax configurations saved successfully.');
+      setTimeout(() => {
+        setBrandingSaved(false);
+        setSaveSuccessMsg(null);
+      }, 3500);
+    } catch (err) {
+      console.error('Failed to save branding:', err);
+    } finally {
+      setIsSavingBranding(false);
+    }
+  };
 
   // New / Edit Item Modal State
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
@@ -351,6 +409,7 @@ export const AdminManager: React.FC = () => {
             { id: 'MENU', label: 'Menu Catalog', icon: Utensils },
             { id: 'TABLES', label: 'Tables & QR', icon: QrCode },
             { id: 'STAFF', label: 'Staff & Waiters', icon: Users },
+            { id: 'SETTINGS', label: 'System & Roles', icon: Sliders },
           ].map((tab) => {
 
             const Icon = tab.icon;
@@ -385,7 +444,7 @@ export const AdminManager: React.FC = () => {
                 <DollarSign className="w-5 h-5 text-emerald-600" />
               </div>
               <p className="text-3xl font-black font-['Outfit'] text-slate-900 mt-2">
-                ${report.totalRevenueToday.toFixed(2)}
+                {settings.branding.currencySymbol} {report.totalRevenueToday.toFixed(2)}
               </p>
             </div>
 
@@ -409,7 +468,7 @@ export const AdminManager: React.FC = () => {
                 <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
               <p className="text-3xl font-black font-['Outfit'] text-slate-900 mt-2">
-                ${report.avgTicketSize.toFixed(2)}
+                {settings.branding.currencySymbol} {report.avgTicketSize.toFixed(2)}
               </p>
             </div>
 
@@ -450,7 +509,7 @@ export const AdminManager: React.FC = () => {
                         {item.count} sold
                       </span>
                       <span className="text-[10px] text-slate-400 font-mono">
-                        ${item.revenue.toFixed(2)}
+                        {settings.branding.currencySymbol} {item.revenue.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -489,7 +548,7 @@ export const AdminManager: React.FC = () => {
                         </p>
                       </div>
                       <span className="text-sm font-black font-mono text-emerald-600">
-                        ${s.totalAmount.toFixed(2)}
+                        {settings.branding.currencySymbol} {s.totalAmount.toFixed(2)}
                       </span>
                     </div>
                   ))
@@ -544,7 +603,7 @@ export const AdminManager: React.FC = () => {
                         {item.description}
                       </p>
                       <span className="text-xs font-mono font-black text-orange-600 mt-1 block">
-                        ${item.price.toFixed(2)}
+                        {settings.branding.currencySymbol} {item.price.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -850,6 +909,538 @@ export const AdminManager: React.FC = () => {
       )}
 
 
+      {/* Tab 5: System Settings & Role Customization */}
+      {activeTab === 'SETTINGS' && (
+        <div className="max-w-7xl mx-auto space-y-8 mt-6">
+          {/* Header & Status Banner */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-800">
+            <div className="flex items-center space-x-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-600/30">
+                <Sliders className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-xl font-black font-['Outfit'] tracking-tight">
+                    Modular System & Workflow Settings
+                  </h2>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-mono">
+                    Mode: {settings.preset}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  Customize station tabs, merge roles (e.g. Waiter + Kitchen), and configure restaurant branding. Changes sync instantly across all devices.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (window.confirm('Reset all settings to default Full-Service configuration?')) {
+                    await resetToDefaults();
+                    setSaveSuccessMsg('System reset to default Full-Service configuration.');
+                    setTimeout(() => setSaveSuccessMsg(null), 3000);
+                  }
+                }}
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-colors flex items-center gap-1.5 border border-slate-700"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset Defaults</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Feedback Success Notification */}
+          {saveSuccessMsg && (
+            <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 text-xs font-bold flex items-center gap-2 animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>{saveSuccessMsg}</span>
+            </div>
+          )}
+
+          {/* Section 1: 1-Click Operating Presets */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div>
+              <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
+                Workflow Presets
+              </span>
+              <h3 className="text-lg font-extrabold text-slate-900 font-['Outfit']">
+                1-Click Restaurant Operating Modes
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Quickly reconfigure tabs and role behaviors based on your restaurant model.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+              {(
+                [
+                  {
+                    id: 'FULL_SERVICE',
+                    name: 'Full-Service Dine-In',
+                    desc: 'Dedicated stations for Kitchen Chefs, Waiter Service, Cashier POS, and QR Ordering.',
+                    icon: Utensils,
+                    badge: 'All Stations Active',
+                    color: 'orange',
+                  },
+                  {
+                    id: 'CAFE_MERGED',
+                    name: 'Cafe & Bistro (Merged)',
+                    desc: 'Kitchen KDS is merged into the Waiter dashboard so servers cook & fulfill orders in one view.',
+                    icon: ChefHat,
+                    badge: 'KDS + Waiter Merged',
+                    color: 'purple',
+                  },
+                  {
+                    id: 'QUICK_SERVICE',
+                    name: 'Quick-Service & Bar',
+                    desc: 'No table waiters. Orders placed at POS/Kiosk sent directly to Kitchen for counter pickup.',
+                    icon: CreditCard,
+                    badge: 'POS + KDS Only',
+                    color: 'emerald',
+                  },
+                  {
+                    id: 'SELF_SERVICE',
+                    name: 'Self-Service & Kiosk',
+                    desc: 'Customers order via QR/Kiosk, Kitchen prepares food, live order tracking without cashier.',
+                    icon: Smartphone,
+                    badge: 'QR + KDS',
+                    color: 'blue',
+                  },
+                ] as const
+              ).map((preset) => {
+                const Icon = preset.icon;
+                const isSelected = settings.preset === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={async () => {
+                      await applyPreset(preset.id as OperatingPreset);
+                      setSaveSuccessMsg(`Switched to ${preset.name} operating mode.`);
+                      setTimeout(() => setSaveSuccessMsg(null), 3000);
+                    }}
+                    className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-orange-500 bg-orange-50/60 ring-2 ring-orange-500 shadow-md shadow-orange-500/10'
+                        : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                            isSelected
+                              ? 'bg-orange-600 text-white'
+                              : 'bg-slate-200 text-slate-700'
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        {isSelected && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-600 text-white font-mono">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-900 font-['Outfit']">
+                        {preset.name}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                        {preset.desc}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-200/60 text-[10px] font-mono font-bold text-slate-500">
+                      {preset.badge}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 2 & 3 Grid: Station Toggles & Workflow Capabilities */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Station Visibility Toggles */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div>
+                <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
+                  Station Modules
+                </span>
+                <h3 className="text-base font-extrabold text-slate-900 font-['Outfit']">
+                  Navigation Tab & Screen Visibility
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Enable or disable operational tabs in the top navigation and launchpad.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                {[
+                  {
+                    key: 'kds' as const,
+                    name: 'Kitchen Display System (KDS)',
+                    path: '/kitchen',
+                    desc: 'Dedicated ticket queue with countdown timers for chefs.',
+                    icon: ChefHat,
+                  },
+                  {
+                    key: 'waiter' as const,
+                    name: 'Waiter Dispatch & Paging',
+                    path: '/waiter',
+                    desc: 'Table floor plan, water/napkin call alerts, and order ready notices.',
+                    icon: BellRing,
+                  },
+                  {
+                    key: 'cashier' as const,
+                    name: 'Cashier & POS Billing',
+                    path: '/cashier',
+                    desc: 'Table session checkout, payment settlements, and receipts.',
+                    icon: CreditCard,
+                  },
+                  {
+                    key: 'customerMenu' as const,
+                    name: 'Customer Table QR Menu',
+                    path: '/table/:num',
+                    desc: 'Self-service digital ordering menu for guest smartphones.',
+                    icon: Smartphone,
+                  },
+                  {
+                    key: 'qrPrint' as const,
+                    name: 'Printable QR Table Stands',
+                    path: '/qr-print',
+                    desc: 'Table QR code placard generator and print sheets.',
+                    icon: QrCode,
+                  },
+                ].map((mod) => {
+                  const Icon = mod.icon;
+                  const isEnabled = settings.modules[mod.key];
+                  return (
+                    <div
+                      key={mod.key}
+                      className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                        isEnabled
+                          ? 'border-slate-200 bg-white'
+                          : 'border-slate-200 bg-slate-50/60 opacity-60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                            isEnabled
+                              ? 'bg-orange-100 text-orange-700'
+                              : 'bg-slate-200 text-slate-500'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-bold text-slate-900">{mod.name}</span>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              {mod.path}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{mod.desc}</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await updateModules({ [mod.key]: !isEnabled });
+                          setSaveSuccessMsg(`${mod.name} is now ${!isEnabled ? 'ENABLED' : 'HIDDEN'}.`);
+                          setTimeout(() => setSaveSuccessMsg(null), 3000);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          isEnabled ? 'bg-orange-600' : 'bg-slate-300'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                            isEnabled ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Role Capabilities & Merged Workflow */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div>
+                <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
+                  Workflow & Roles
+                </span>
+                <h3 className="text-base font-extrabold text-slate-900 font-['Outfit']">
+                  Role Merging & Capabilities
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Empower staff roles to absorb multiple functions for lean restaurant operations.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                {[
+                  {
+                    key: 'mergeKitchenIntoWaiter' as const,
+                    name: 'Merge Kitchen into Waiter Dashboard',
+                    desc: 'Waiters can see live incoming tickets, start cooking, and mark orders as Ready directly from the Waiter screen.',
+                    icon: ChefHat,
+                    highlight: true,
+                  },
+                  {
+                    key: 'cashierCanTakeOrders' as const,
+                    name: 'Allow Cashiers to Enter Orders',
+                    desc: 'Cashiers can punch in dine-in or takeout tickets directly from the POS checkout register.',
+                    icon: CreditCard,
+                    highlight: false,
+                  },
+                  {
+                    key: 'waiterCanSettleBills' as const,
+                    name: 'Allow Waiters to Settle Bills',
+                    desc: 'Waiters can mark tables as paid & close dining sessions directly on the dining floor.',
+                    icon: Receipt,
+                    highlight: false,
+                  },
+                  {
+                    key: 'soundAlerts' as const,
+                    name: 'Real-Time Sound Chimes',
+                    desc: 'Play audio chimes whenever a new order is placed, food is ready, or a customer calls for water/bill.',
+                    icon: BellRing,
+                    highlight: false,
+                  },
+                ].map((cap) => {
+                  const Icon = cap.icon;
+                  const isEnabled = settings.workflow[cap.key];
+                  return (
+                    <div
+                      key={cap.key}
+                      className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                        cap.highlight && isEnabled
+                          ? 'border-purple-200 bg-purple-50/50'
+                          : isEnabled
+                          ? 'border-slate-200 bg-white'
+                          : 'border-slate-200 bg-slate-50/60 opacity-70'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                            cap.highlight && isEnabled
+                              ? 'bg-purple-100 text-purple-700'
+                              : isEnabled
+                              ? 'bg-orange-100 text-orange-700'
+                              : 'bg-slate-200 text-slate-500'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-slate-900 block">{cap.name}</span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{cap.desc}</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await updateWorkflow({ [cap.key]: !isEnabled });
+                          setSaveSuccessMsg(`${cap.name} is now ${!isEnabled ? 'ENABLED' : 'DISABLED'}.`);
+                          setTimeout(() => setSaveSuccessMsg(null), 3000);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          isEnabled
+                            ? cap.highlight
+                              ? 'bg-purple-600'
+                              : 'bg-orange-600'
+                            : 'bg-slate-300'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                            isEnabled ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Restaurant Branding & Currency */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
+                  Brand & Localization
+                </span>
+                <h3 className="text-base font-extrabold text-slate-900 font-['Outfit']">
+                  Restaurant Branding & Currency
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Customize the restaurant name, tagline, currency symbol, and tax rates.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveBranding}
+                disabled={isSavingBranding}
+                className="self-start sm:self-auto px-4 py-2 bg-orange-600 hover:bg-orange-500 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-md shadow-orange-600/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isSavingBranding ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>Save Brand & Localization</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Restaurant / Brand Name
+                </label>
+                <input
+                  type="text"
+                  value={brandingForm.name}
+                  onChange={(e) => setBrandingForm({ ...brandingForm, name: e.target.value })}
+                  placeholder="Dine OS"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-bold text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Tagline / Subtitle
+                </label>
+                <input
+                  type="text"
+                  value={brandingForm.tagline}
+                  onChange={(e) => setBrandingForm({ ...brandingForm, tagline: e.target.value })}
+                  placeholder="Smart POS & Kitchen Display System"
+                  className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Currency Symbol
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={brandingForm.currencySymbol}
+                    onChange={(e) => setBrandingForm({ ...brandingForm, currencySymbol: e.target.value })}
+                    className="w-20 p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono font-bold text-center text-xs"
+                  />
+                  <div className="flex items-center space-x-1 overflow-x-auto text-[11px] font-mono">
+                    {['ETB', '$', '€', '£', 'SAR', 'AED', '₹'].map((curr) => (
+                      <button
+                        key={curr}
+                        type="button"
+                        onClick={() => setBrandingForm({ ...brandingForm, currencySymbol: curr })}
+                        className={`px-2 py-1.5 rounded-lg border font-bold ${
+                          brandingForm.currencySymbol === curr
+                            ? 'bg-orange-600 text-white border-orange-600'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                        }`}
+                      >
+                        {curr}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Tax Rate (%)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  value={brandingForm.taxRate}
+                  onChange={(e) =>
+                    setBrandingForm({ ...brandingForm, taxRate: parseFloat(e.target.value) || 0 })
+                  }
+                  className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Service Charge (%)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  value={brandingForm.serviceCharge}
+                  onChange={(e) =>
+                    setBrandingForm({ ...brandingForm, serviceCharge: parseFloat(e.target.value) || 0 })
+                  }
+                  className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Bottom Action Footer with Save Button */}
+            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs">
+                {brandingSaved ? (
+                  <span className="text-emerald-600 font-bold flex items-center gap-1.5 animate-fade-in">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Branding, currency, & tax rates saved successfully!</span>
+                  </span>
+                ) : (
+                  <span className="text-slate-400">
+                    Click "Save Brand & Localization" to persist changes across all digital menus, POS terminals, and receipts.
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveBranding}
+                disabled={isSavingBranding}
+                className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-md shadow-orange-600/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isSavingBranding ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Saving Configuration...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>Save Brand & Localization</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add / Edit Dish Modal */}
       {isItemModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
@@ -893,7 +1484,9 @@ export const AdminManager: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Price ($ USD)</label>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Price ({settings.branding.currencySymbol})
+                  </label>
                   <input
                     type="number"
                     step="0.01"

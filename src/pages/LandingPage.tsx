@@ -20,12 +20,14 @@ import {
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
 import { StaffPinModal } from '../components/StaffPinModal';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isConnected } = useSocket();
   const { currentStaff, isPinModalOpen, openPinModal, closePinModal, logout } = useAuth();
+  const { settings } = useSettings();
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
   useEffect(() => {
@@ -51,32 +53,42 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const coreFeatures = [
+  const allFeatures = [
     {
+      key: 'customerMenu',
       title: 'Digital Table QR Ordering',
       description: 'Customers scan table QR codes to browse the menu, customize orders, and request service in real time.',
       icon: Smartphone,
       color: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+      enabled: settings.modules.customerMenu,
     },
     {
+      key: 'kds',
       title: 'Kitchen Display System (KDS)',
       description: 'Instant ticket routing to prep stations with live countdown timers and status synchronization.',
       icon: ChefHat,
       color: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+      enabled: settings.modules.kds,
     },
     {
+      key: 'waiter',
       title: 'Floor Service & Waiter Dispatch',
       description: 'Live table paging alerts, call-bell requests, and food delivery tracking for floor staff.',
       icon: BellRing,
       color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+      enabled: settings.modules.waiter,
     },
     {
+      key: 'cashier',
       title: 'Point of Sale & Billing',
       description: 'Seamless checkouts with cash, card, and QR payments, instant invoicing, and management analytics.',
       icon: CreditCard,
       color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+      enabled: settings.modules.cashier,
     },
   ];
+
+  const coreFeatures = allFeatures.filter((f) => f.enabled);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-orange-500 selection:text-white relative overflow-hidden">
@@ -96,10 +108,10 @@ export const LandingPage: React.FC = () => {
             </div>
             <div>
               <span className="font-extrabold text-xl tracking-tight font-['Outfit'] bg-gradient-to-r from-white via-orange-100 to-orange-400 bg-clip-text text-transparent">
-                Dine <span className="text-orange-500">OS</span>
+                {settings.branding.name || 'Dine OS'}
               </span>
-              <span className="hidden sm:inline-block ml-2.5 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/30">
-                POS & KDS Suite
+              <span className="hidden sm:inline-block ml-2.5 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/30 font-mono">
+                {settings.preset === 'CAFE_MERGED' ? 'Cafe Mode' : settings.preset === 'QUICK_SERVICE' ? 'Quick POS' : 'Pro Suite'}
               </span>
             </div>
           </div>

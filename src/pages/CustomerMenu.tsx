@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Category, MenuItem, CartItem, TableSession, Order } from '../types';
 import { useSocket } from '../context/SocketContext';
+import { useSettings } from '../context/SettingsContext';
 import { CartDrawer } from '../components/CartDrawer';
 import { CallWaiterModal } from '../components/CallWaiterModal';
 import { apiUrl } from '../utils/api';
@@ -23,6 +24,7 @@ export const CustomerMenu: React.FC = () => {
   const { tableNumber = '01' } = useParams<{ tableNumber: string }>();
   const navigate = useNavigate();
   const { socket, joinRoom } = useSocket();
+  const { settings } = useSettings();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | 'ALL'>('ALL');
@@ -201,8 +203,13 @@ export const CustomerMenu: React.FC = () => {
                   </span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black font-['Outfit'] mt-1 bg-gradient-to-r from-white via-orange-100 to-amber-200 bg-clip-text text-transparent">
-                  Gourmet Dining Experience
+                  {settings.branding.name || 'Gourmet Dining Experience'}
                 </h1>
+                {settings.branding.tagline && (
+                  <p className="text-xs text-orange-200/80 mt-0.5 line-clamp-1">
+                    {settings.branding.tagline}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -370,7 +377,7 @@ export const CustomerMenu: React.FC = () => {
                       <div className="mt-2 flex items-center justify-between pt-1">
                         <div>
                           <span className="text-base font-extrabold text-slate-900 font-['Outfit']">
-                            ${item.price.toFixed(2)}
+                            {settings.branding.currencySymbol} {item.price.toFixed(2)}
                           </span>
                           <span className="ml-2 text-[10px] text-slate-400 font-medium">
                             ~{item.prepTimeMinutes}m prep
@@ -447,7 +454,7 @@ export const CustomerMenu: React.FC = () => {
                   {totalCartCount} {totalCartCount === 1 ? 'item' : 'items'} in order
                 </p>
                 <p className="text-base font-extrabold font-['Outfit'] text-white">
-                  ${totalCartPrice.toFixed(2)}
+                  {settings.branding.currencySymbol} {totalCartPrice.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -491,7 +498,7 @@ export const CustomerMenu: React.FC = () => {
                     {selectedItemForModal.name}
                   </h3>
                   <p className="text-base font-extrabold text-orange-600 font-['Outfit'] mt-0.5">
-                    ${selectedItemForModal.price.toFixed(2)}
+                    {settings.branding.currencySymbol} {selectedItemForModal.price.toFixed(2)}
                   </p>
                 </div>
                 <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
@@ -546,7 +553,7 @@ export const CustomerMenu: React.FC = () => {
                 >
                   <Plus className="w-4 h-4" />
                   <span>
-                    Add to Cart · ${(selectedItemForModal.price * modalItemQty).toFixed(2)}
+                    Add to Cart · {settings.branding.currencySymbol} {(selectedItemForModal.price * modalItemQty).toFixed(2)}
                   </span>
                 </button>
               </div>

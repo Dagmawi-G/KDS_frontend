@@ -10,6 +10,7 @@ import {
   Receipt as ReceiptIcon,
 } from 'lucide-react';
 import { TableSession } from '../types';
+import { useSettings } from '../context/SettingsContext';
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   onSettlePayment,
   isCashierView = false,
 }) => {
+  const { settings } = useSettings();
   const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CASH' | 'QR_PAY' | 'TRANSFER'>('CARD');
   const [isSettling, setIsSettling] = useState(false);
 
@@ -35,8 +37,11 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
 
   const validOrders = (session.orders || []).filter((o) => o.status !== 'CANCELLED');
   const subtotal = validOrders.reduce((sum, o) => sum + o.subtotal, 0);
-  const tax = validOrders.reduce((sum, o) => sum + o.tax, 0);
-  const total = validOrders.reduce((sum, o) => sum + o.total, 0);
+  const taxRate = typeof settings.branding?.taxRate === 'number' ? settings.branding.taxRate : 10;
+  const serviceChargeRate = typeof settings.branding?.serviceCharge === 'number' ? settings.branding.serviceCharge : 0;
+  const calculatedTax = Math.round(subtotal * (taxRate / 100) * 100) / 100;
+  const calculatedServiceCharge = Math.round(subtotal * (serviceChargeRate / 100) * 100) / 100;
+  const total = validOrders.reduce((sum, o) => sum + o.total, 0) || Math.round((subtotal + calculatedTax + calculatedServiceCharge) * 100) / 100;
 
   const handleSettle = async () => {
     if (!onSettlePayment) return;
@@ -78,9 +83,9 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
             <ReceiptIcon className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-extrabold text-slate-900 font-['Outfit']">
-            Gourmet<span className="text-orange-600">OS</span> Bistro
+            {settings.branding.name || 'Dine OS Bistro'}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">100 Culinary Avenue, Suite 400</p>
+          <p className="text-xs text-slate-500 mt-0.5">{settings.branding.tagline || '100 Culinary Avenue, Suite 400'}</p>
           <div className="mt-3 flex items-center justify-between text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200 font-mono">
             <div>
               <span className="text-slate-400 block text-[10px]">TABLE</span>
@@ -126,7 +131,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
                         )}
                       </div>
                       <span className="font-mono font-medium">
-                        ${(item.unitPrice * item.quantity).toFixed(2)}
+                        {settings.branding.currencySymbol} {(item.unitPrice * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   ))}
@@ -140,15 +145,21 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
         <div className="pt-3 border-t border-dashed border-slate-300 space-y-1.5 text-xs">
           <div className="flex justify-between text-slate-600">
             <span>Subtotal</span>
-            <span className="font-mono font-medium">${subtotal.toFixed(2)}</span>
+            <span className="font-mono font-medium">{settings.branding.currencySymbol} {subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-slate-600">
-            <span>Sales Tax (10%)</span>
-            <span className="font-mono font-medium">${tax.toFixed(2)}</span>
+            <span>Sales Tax ({taxRate}%)</span>
+            <span className="font-mono font-medium">{settings.branding.currencySymbol} {calculatedTax.toFixed(2)}</span>
           </div>
+          {serviceChargeRate > 0 && (
+            <div className="flex justify-between text-slate-600">
+              <span>Service Charge ({serviceChargeRate}%)</span>
+              <span className="font-mono font-medium">{settings.branding.currencySymbol} {calculatedServiceCharge.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
             <span>Grand Total</span>
-            <span className="font-mono text-orange-600">${total.toFixed(2)}</span>
+            <span className="font-mono text-orange-600">{settings.branding.currencySymbol} {total.toFixed(2)}</span>
           </div>
         </div>
 

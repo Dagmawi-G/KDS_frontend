@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
 import { sounds } from '../utils/audio';
 import { StaffPinModal } from './StaffPinModal';
 
@@ -28,6 +29,7 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { isConnected } = useSocket();
   const { currentStaff, isPinModalOpen, openPinModal, closePinModal, logout } = useAuth();
+  const { settings } = useSettings();
 
   const [isMuted, setIsMuted] = useState(sounds.getMuted());
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
@@ -109,45 +111,59 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const navLinks = [
+  const allNavLinks = [
     {
+      key: 'customerMenu',
       to: `/table/${selectedTable}`,
       label: 'QR Table',
       icon: Smartphone,
       badge: `T-${selectedTable}`,
+      enabled: settings.modules.customerMenu,
       activeMatch: (path: string) => path.startsWith('/table/'),
     },
     {
+      key: 'kds',
       to: '/kitchen',
       label: 'Kitchen KDS',
       icon: ChefHat,
+      enabled: settings.modules.kds,
       activeMatch: (path: string) => path === '/kitchen',
     },
     {
+      key: 'waiter',
       to: '/waiter',
       label: 'Waiter Dispatch',
       icon: BellRing,
+      enabled: settings.modules.waiter,
       activeMatch: (path: string) => path === '/waiter',
     },
     {
+      key: 'cashier',
       to: '/cashier',
       label: 'Cashier POS',
       icon: CreditCard,
+      enabled: settings.modules.cashier,
       activeMatch: (path: string) => path === '/cashier',
     },
     {
+      key: 'admin',
       to: '/admin',
-      label: 'Admin & Reports',
+      label: 'Admin & Settings',
       icon: Settings,
+      enabled: true,
       activeMatch: (path: string) => path === '/admin',
     },
     {
+      key: 'qrPrint',
       to: '/qr-print',
       label: 'QR Stands',
       icon: QrCode,
+      enabled: settings.modules.qrPrint,
       activeMatch: (path: string) => path === '/qr-print',
     },
   ];
+
+  const navLinks = allNavLinks.filter((link) => link.enabled);
 
   const handleTableChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTable = e.target.value;
@@ -174,10 +190,10 @@ export const Navbar: React.FC = () => {
                 </div>
                 <div>
                   <span className="font-extrabold text-lg tracking-tight font-['Outfit',sans-serif] bg-gradient-to-r from-white via-orange-100 to-orange-300 bg-clip-text text-transparent">
-                    Dine <span className="text-orange-500">OS</span>
+                    {settings.branding.name || 'Dine OS'}
                   </span>
-                  <span className="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                    Smart POS & KDS
+                  <span className="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 font-mono">
+                    {settings.preset === 'CAFE_MERGED' ? 'Cafe Mode' : settings.preset === 'QUICK_SERVICE' ? 'Quick POS' : 'Pro Suite'}
                   </span>
                 </div>
               </Link>

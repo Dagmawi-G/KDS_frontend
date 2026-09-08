@@ -17,12 +17,14 @@ import {
 } from 'lucide-react';
 import { Table, TableStatus, TableSession } from '../types';
 import { useSocket } from '../context/SocketContext';
+import { useSettings } from '../context/SettingsContext';
 import { ReceiptModal } from '../components/ReceiptModal';
 import { apiUrl } from '../utils/api';
 
 export const CashierPOS: React.FC = () => {
   const navigate = useNavigate();
   const { socket, joinRoom } = useSocket();
+  const { settings } = useSettings();
 
   const [tables, setTables] = useState<Table[]>([]);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
@@ -286,7 +288,7 @@ export const CashierPOS: React.FC = () => {
               Active Floor Balance
             </p>
             <p className="text-2xl font-black font-['Outfit'] text-slate-900 mt-0.5">
-              ${totalFloorRevenue.toFixed(2)}
+              {settings.branding.currencySymbol} {totalFloorRevenue.toFixed(2)}
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
@@ -374,7 +376,7 @@ export const CashierPOS: React.FC = () => {
                   <div>
                     <span className="text-[10px] text-slate-500 block font-medium">Balance</span>
                     <span className="font-extrabold text-sm font-mono text-slate-900">
-                      ${(table.totalAmount || 0).toFixed(2)}
+                      {settings.branding.currencySymbol} {(table.totalAmount || 0).toFixed(2)}
                     </span>
                   </div>
 
@@ -460,7 +462,7 @@ export const CashierPOS: React.FC = () => {
                       Active Orders ({activeSession.orders.length})
                     </h4>
                     <span className="text-xs font-mono font-extrabold text-orange-600">
-                      ${(selectedTable.totalAmount || 0).toFixed(2)}
+                      {settings.branding.currencySymbol} {(selectedTable.totalAmount || 0).toFixed(2)}
                     </span>
                   </div>
 
@@ -483,7 +485,7 @@ export const CashierPOS: React.FC = () => {
                             <div key={item.id} className="flex justify-between">
                               <span>{item.quantity}x {item.menuItem?.name}</span>
                               <span className="font-mono">
-                                ${(item.unitPrice * item.quantity).toFixed(2)}
+                                {settings.branding.currencySymbol} {(item.unitPrice * item.quantity).toFixed(2)}
                               </span>
                             </div>
                           ))}
@@ -499,7 +501,7 @@ export const CashierPOS: React.FC = () => {
                   >
                     <CreditCard className="w-4 h-4" />
                     <span>
-                      Settle Bill (${(selectedTable.totalAmount || 0).toFixed(2)})
+                      Settle Bill ({settings.branding.currencySymbol} {(selectedTable.totalAmount || 0).toFixed(2)})
                     </span>
                   </button>
                 </div>

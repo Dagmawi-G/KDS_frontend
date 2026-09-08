@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Order, OrderStatus, TableSession } from '../types';
 import { useSocket } from '../context/SocketContext';
+import { useSettings } from '../context/SettingsContext';
 import { CallWaiterModal } from '../components/CallWaiterModal';
 import { ReceiptModal } from '../components/ReceiptModal';
 import { apiUrl } from '../utils/api';
@@ -22,6 +23,7 @@ export const OrderTracker: React.FC = () => {
   const { tableNumber = '01' } = useParams<{ tableNumber: string }>();
   const navigate = useNavigate();
   const { socket, joinRoom } = useSocket();
+  const { settings } = useSettings();
 
   const [session, setSession] = useState<TableSession | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -123,8 +125,11 @@ export const OrderTracker: React.FC = () => {
 
   const validOrders = orders.filter((o) => o.status !== 'CANCELLED');
   const subtotal = validOrders.reduce((sum, o) => sum + o.subtotal, 0);
-  const tax = validOrders.reduce((sum, o) => sum + o.tax, 0);
-  const grandTotal = validOrders.reduce((sum, o) => sum + o.total, 0);
+  const taxRate = typeof settings.branding?.taxRate === 'number' ? settings.branding.taxRate : 10;
+  const serviceChargeRate = typeof settings.branding?.serviceCharge === 'number' ? settings.branding.serviceCharge : 0;
+  const calculatedTax = Math.round(subtotal * (taxRate / 100) * 100) / 100;
+  const calculatedServiceCharge = Math.round(subtotal * (serviceChargeRate / 100) * 100) / 100;
+  const grandTotal = validOrders.reduce((sum, o) => sum + o.total, 0) || Math.round((subtotal + calculatedTax + calculatedServiceCharge) * 100) / 100;
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
@@ -303,7 +308,7 @@ export const OrderTracker: React.FC = () => {
                             )}
                           </div>
                           <span className="font-mono font-bold text-slate-700">
-                            ${(item.unitPrice * item.quantity).toFixed(2)}
+                            {settings.branding.currencySymbol} {(item.unitPrice * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       ))}
@@ -335,15 +340,21 @@ export const OrderTracker: React.FC = () => {
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-mono font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-mono font-medium">{settings.branding.currencySymbol} {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Sales Tax (10%)</span>
-                  <span className="font-mono font-medium">${tax.toFixed(2)}</span>
+                  <span>Sales Tax ({taxRate}%)</span>
+                  <span className="font-mono font-medium">{settings.branding.currencySymbol} {calculatedTax.toFixed(2)}</span>
                 </div>
+                {serviceChargeRate > 0 && (
+                  <div className="flex justify-between">
+                    <span>Service Charge ({serviceChargeRate}%)</span>
+                    <span className="font-mono font-medium">{settings.branding.currencySymbol} {calculatedServiceCharge.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
                   <span>Current Balance</span>
-                  <span className="font-mono text-orange-600">${grandTotal.toFixed(2)}</span>
+                  <span className="font-mono text-orange-600">{settings.branding.currencySymbol} {grandTotal.toFixed(2)}</span>
                 </div>
               </div>
 

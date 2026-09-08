@@ -125,3 +125,36 @@ export interface DashboardReport {
   topSellingItems: { name: string; count: number; revenue: number }[];
   recentBills: TableSession[];
 }
+
+export type OperatingPreset = 'FULL_SERVICE' | 'CAFE_MERGED' | 'QUICK_SERVICE' | 'SELF_SERVICE' | 'CUSTOM';
+
+export interface ModuleSettings {
+  kds: boolean;
+  waiter: boolean;
+  cashier: boolean;
+  customerMenu: boolean;
+  qrPrint: boolean;
+}
+
+export interface WorkflowCapabilities {
+  mergeKitchenIntoWaiter: boolean;
+  cashierCanTakeOrders: boolean;
+  waiterCanSettleBills: boolean;
+  soundAlerts: boolean;
+}
+
+export interface RestaurantBranding {
+  name: string;
+  tagline: string;
+  currencySymbol: string;
+  taxRate: number;
+  serviceCharge: number;
+}
+
+export interface SystemSettings {
+  preset: OperatingPreset;
+  modules: ModuleSettings;
+  workflow: WorkflowCapabilities;
+  branding: RestaurantBranding;
+}
+

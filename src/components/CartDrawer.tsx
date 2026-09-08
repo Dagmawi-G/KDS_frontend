@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingBag, X, Plus, Minus, Trash2, Send, ChefHat, MessageSquareQuote } from 'lucide-react';
 import { CartItem } from '../types';
 import { apiUrl } from '../utils/api';
+import { useSettings } from '../context/SettingsContext';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -24,15 +25,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateNotes,
   onOrderSuccess,
 }) => {
+  const { settings } = useSettings();
   const [specialNotes, setSpecialNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
+  const taxRate = typeof settings.branding?.taxRate === 'number' ? settings.branding.taxRate : 10;
+  const serviceChargeRate = typeof settings.branding?.serviceCharge === 'number' ? settings.branding.serviceCharge : 0;
+
   const subtotal = items.reduce((sum, item) => sum + item.menuItem.price * item.quantity, 0);
-  const tax = Math.round(subtotal * 0.1 * 100) / 100;
-  const total = Math.round((subtotal + tax) * 100) / 100;
+  const tax = Math.round(subtotal * (taxRate / 100) * 100) / 100;
+  const serviceCharge = Math.round(subtotal * (serviceChargeRate / 100) * 100) / 100;
+  const total = Math.round((subtotal + tax + serviceCharge) * 100) / 100;
 
   const handlePlaceOrder = async () => {
     if (items.length === 0) return;
@@ -133,9 +139,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         {item.menuItem.name}
                       </h4>
                       <p className="text-xs font-semibold text-orange-600 mt-0.5 font-mono">
-                        ${(item.menuItem.price * item.quantity).toFixed(2)}{' '}
+                        {settings.branding.currencySymbol} {(item.menuItem.price * item.quantity).toFixed(2)}{' '}
                         <span className="text-[11px] text-slate-400 font-normal">
-                          (${item.menuItem.price.toFixed(2)} ea)
+                          ({settings.branding.currencySymbol} {item.menuItem.price.toFixed(2)} ea)
                         </span>
                       </p>
                     </div>
@@ -204,15 +210,21 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="space-y-1.5 pt-2 border-t border-slate-200/80 text-xs">
                 <div className="flex justify-between text-slate-600">
                   <span>Subtotal</span>
-                  <span className="font-mono font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="font-mono font-medium">{settings.branding.currencySymbol} {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>Estimated Tax (10%)</span>
-                  <span className="font-mono font-medium">${tax.toFixed(2)}</span>
+                  <span>Sales Tax ({taxRate}%)</span>
+                  <span className="font-mono font-medium">{settings.branding.currencySymbol} {tax.toFixed(2)}</span>
                 </div>
+                {serviceChargeRate > 0 && (
+                  <div className="flex justify-between text-slate-600">
+                    <span>Service Charge ({serviceChargeRate}%)</span>
+                    <span className="font-mono font-medium">{settings.branding.currencySymbol} {serviceCharge.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-bold text-slate-900 pt-1 border-t border-slate-200">
                   <span>Round Total</span>
-                  <span className="font-mono text-orange-600">${total.toFixed(2)}</span>
+                  <span className="font-mono text-orange-600">{settings.branding.currencySymbol} {total.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -230,7 +242,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>Send Order to Kitchen (${total.toFixed(2)})</span>
+                    <span>Send Order to Kitchen ({settings.branding.currencySymbol} {total.toFixed(2)})</span>
                   </>
                 )}
               </button>
