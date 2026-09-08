@@ -1276,37 +1276,16 @@ export const AdminManager: React.FC = () => {
 
           {/* Section 4: Restaurant Branding & Currency */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
-                  Brand & Localization
-                </span>
-                <h3 className="text-base font-extrabold text-slate-900 font-['Outfit']">
-                  Restaurant Branding & Currency
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Customize the restaurant name, tagline, currency symbol, and tax rates.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSaveBranding}
-                disabled={isSavingBranding}
-                className="self-start sm:self-auto px-4 py-2 bg-orange-600 hover:bg-orange-500 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-md shadow-orange-600/30 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
-              >
-                {isSavingBranding ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    <span>Save Brand & Localization</span>
-                  </>
-                )}
-              </button>
+            <div>
+              <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">
+                Brand & Localization
+              </span>
+              <h3 className="text-base font-extrabold text-slate-900 font-['Outfit']">
+                Restaurant Branding & Currency
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Customize the restaurant name, tagline, currency symbol, and tax rates.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
